@@ -32,4 +32,15 @@ while ( my $item = $items->next ) {
         '... and it should have the correct class name';
 }
 
+my @items = $objects->resultset('Item')->search( 
+    { price => { '>' => 1.2 } }
+)->all;
+is @items, 2, 'We should be able to search correctly';
+foreach my $item (@items) {
+    ok $item->isa('My::Object::Item'),
+        '... and it should have the correct class name';
+    cmp_ok $item->price, '>', 1.2,
+        '... and the search parameters should be respected';
+}
+
 done_testing;

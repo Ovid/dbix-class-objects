@@ -31,6 +31,13 @@ sub next {
     return $self->object_class_name->new( { result_source => $result } );
 }
 
+sub all {
+    my $self         = shift;
+    my @all          = $self->next::method(@_);
+    my $object_class = $self->object_class_name;
+    return map { $object_class->new( { result_source => $_ } ) } @all;
+}
+
 #around 'all' => sub {
 #    my $orig = shift;
 #    my $self = shift;
