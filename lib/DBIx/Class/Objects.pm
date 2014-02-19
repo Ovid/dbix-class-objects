@@ -85,8 +85,15 @@ sub _add_methods {
         my $other_class = $self->get_object_class_name($source);
 
         if ($is_multi) {
-
-            # TODO
+            $meta->add_method(
+                $relationship => sub {
+                    my $self      = shift;
+                    my $resultset = $self->result_source->$relationship(@_)
+                      or return;
+                    return DBIx::Class::Objects::ResultSet->meta
+                      ->rebless_instance($resultset);
+                },
+            );
         }
         else {
             $meta->add_method(

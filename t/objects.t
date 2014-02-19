@@ -26,9 +26,10 @@ foreach my $attribute (@attributes) {
     is $person->$attribute, $person_result->$attribute,
       "The '$attribute' attribute should be delegated correctly";
 }
-ok !$person->can('save'), '... but other dbic attributes should not be inherited';
+ok !$person->can('save'),
+  '... but other dbic attributes should not be inherited';
 ok $person->result_source->isa('Sample::Schema::Result::Person'),
-    '... but we can get at them via our result_source()';
+  '... but we can get at them via our result_source()';
 
 $fixtures->load('basic_customer');
 my $customer = $fixtures->get_result('basic_customer');
@@ -36,5 +37,18 @@ $person_result = $fixtures->get_result('person_with_customer');
 $person = My::Object::Person->new( { result_source => $person_result } );
 
 isa_ok $person->customer, 'My::Object::Customer';
+
+$fixtures->load('order_with_items');
+my $order_result = $fixtures->get_result('order_with_items');
+my $order        = My::Object::Order->new( { result_source => $order_result } );
+my $order_items  = $order->order_items;
+is $order_items->count, 2, 'Methods returning resultsets should work';
+ok $order_items->isa('DBIx::Class::Objects::ResultSet'),
+  '... and should return our custom result set';
+
+while ( my $order_item = $order_items->next ) {
+    ok $order_item->isa('My::Object::OrderItem'),
+      '... and individual results should have the right class';
+}
 
 done_testing;
