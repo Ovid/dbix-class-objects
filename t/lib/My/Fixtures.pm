@@ -65,6 +65,13 @@ my %definition_for = (
         },
     },
 
+    all_items => [qw/item_hammer item_screwdriver item_beer/],
+
+    item_beer => {
+        new => 'Item',
+        using => { name => 'Beer', price => 1.5 },
+    },
+
     # create an order with two items on it
     item_hammer => {
         new   => 'Item',

@@ -25,6 +25,12 @@ sub find {
         { result_source => $self->next::method(@_) } );
 }
 
+sub next {
+    my $self   = shift;
+    my $result = $self->next::method or return;
+    return $self->object_class_name->new( { result_source => $result } );
+}
+
 #around 'all' => sub {
 #    my $orig = shift;
 #    my $self = shift;
