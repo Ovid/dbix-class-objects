@@ -49,13 +49,6 @@ sub get_object_class_name {
     return $self->object_base . '::' . $source_name;
 }
 
-sub BUILD {
-    my $self = shift;
-
-    # XXX bless me father, for I have sinned
-    $self->schema->{__object_base__} = $self->object_base;
-}
-
 sub resultset {
     my ( $self, $source_name ) = @_;
 
