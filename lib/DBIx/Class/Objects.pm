@@ -8,7 +8,6 @@ use DBIx::Class::Objects::Role::Result;
 
 use Class::Load 'try_load_class';
 use namespace::autoclean;
-with 'DBIx::Class::Objects::Role::ClassName';
 
 our $VERSION = '0.01';
 
@@ -37,6 +36,18 @@ has 'result_role' => (
     required => 1,
     default  => 'DBIx::Class::Objects::Role::Result',
 );
+
+has 'object_base' => (
+    is       => 'rw',
+    isa      => 'Str',
+    required => 0,  # XXX Fix this later
+    writer   => '_set_object_base',
+);
+
+sub get_object_class_name {
+    my ( $self, $source_name ) = @_;
+    return $self->object_base . '::' . $source_name;
+}
 
 sub BUILD {
     my $self = shift;
