@@ -28,19 +28,20 @@ my $items = $objects->resultset('Item');
 is $items->count, 3, 'We should have the correct number of items';
 
 while ( my $item = $items->next ) {
+    my $ref = ref $item;
+    show $ref;
     ok $item->isa('My::Object::Item'),
-        '... and it should have the correct class name';
+      '... and it should have the correct class name';
 }
 
-my @items = $objects->resultset('Item')->search( 
-    { price => { '>' => 1.2 } }
-)->all;
+my @items
+  = $objects->resultset('Item')->search( { price => { '>' => 1.2 } } )->all;
 is @items, 2, 'We should be able to search correctly';
 foreach my $item (@items) {
     ok $item->isa('My::Object::Item'),
-        '... and it should have the correct class name';
+      '... and it should have the correct class name';
     cmp_ok $item->price, '>', 1.2,
-        '... and the search parameters should be respected';
+      '... and the search parameters should be respected';
 }
 
 done_testing;

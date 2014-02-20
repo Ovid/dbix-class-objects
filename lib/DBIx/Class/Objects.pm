@@ -5,7 +5,6 @@ use Moose;
 # using this because it will be applied to result classes, not because we want
 # to import this behavior
 use DBIx::Class::Objects::Role::Result;
-use DBIx::Class::Objects::ResultSet;
 
 use Class::Load 'try_load_class';
 use namespace::autoclean;
@@ -25,6 +24,20 @@ has 'debug' => (
     default => 0,
 );
 
+has 'base_class' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    default  => 'DBIx::Class::Objects::Base',
+);
+
+has 'result_role' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    default  => 'DBIx::Class::Objects::Role::Result',
+);
+
 sub BUILD {
     my $self = shift;
 
@@ -35,8 +48,55 @@ sub BUILD {
 sub resultset {
     my ( $self, $source_name ) = @_;
 
-    my $resultset = $self->schema->resultset($source_name);
-    return DBIx::Class::Objects::ResultSet->meta->rebless_instance($resultset);
+    return $self->_create_object_set(
+        $self->schema->resultset($source_name) );
+}
+
+sub _create_object_set {
+    my ( $self, $resultset ) = @_;
+
+    my %methods;
+    foreach my $method (qw/find first next/) {
+
+        # Haven't debugged this, but simply declaring a single subroutine and
+        # assigning it to the keys doesn't work. You get errors like this:
+        #
+        # DBIx::Class::ResultSet::find(): find() expects either a column/value
+        # hashref, or a list of values corresponding to the columns of the
+        # specified unique constraint 'primary' at t/resultset.t line 30
+        #
+        # Doing it this way results in a fresh copy of the subref for every
+        # method
+        $methods{$method} = sub {
+            my $this         = shift;
+            my $result       = $this->next::method(@_) or return;
+            my $object_class = $self->get_object_class_name(
+                $result->result_source->source_name );
+            return $object_class->new( { result_source => $result } );
+        };
+    }
+
+    # we do it this way because they might have created a custom
+    # resultset class and thus, we don't know *which* class we're inheriting
+    # from.
+    my $meta = Moose::Meta::Class->create_anon_class(
+        superclasses => [ ref $resultset ],
+        cache        => 1,
+        methods      => {
+            %methods,
+            all => sub {
+                my $this = shift;
+                my @all  = $this->next::method(@_);
+                return unless @all;
+                my $object_class = $self->get_object_class_name(
+                    $all[0]->result_source->source_name );
+                return
+                  map { $object_class->new( { result_source => $_ } ) } @all;
+            },
+        },
+    );
+    $meta->rebless_instance($resultset);
+    return $resultset;
 }
 
 sub load_objects {
@@ -55,11 +115,20 @@ sub load_objects {
             $self->_debug("\t$class not found. Building.");
             Moose::Meta::Class->create(
                 $class,
-                superclasses => ['Moose::Object'],
+                superclasses => [ $self->base_class ],
             );
             unless ( Class::Load::is_class_loaded($class) ) {
                 die "$class didn't load";
             }
+        }
+
+        # XXX Not sure about this. If they forget to inherit from
+        # DBIx::Class::Objects::Base, we do it for them. It works around an
+        # issue the programmer might forget, but is this too much magic, given
+        # that we're already doing a lot of it?
+        unless ( $class->isa( $self->base_class ) ) {
+            $class->meta->superclasses( $class->meta->superclasses,
+                $self->base_class );
         }
         $self->_add_methods( $class, $source_name );
     }
@@ -71,39 +140,43 @@ sub _add_methods {
     my $meta   = $class->meta;
 
     my $source = $schema->resultset($source_name)->result_source;
-    DBIx::Class::Objects::Role::Result->meta->apply(
+    $self->result_role->meta->apply(
         $meta,
         handles => [ $source->columns ],
     );
 
     my @relationships = $source->relationships;
     foreach my $relationship (@relationships) {
-        my $info     = $source->relationship_info($relationship);
+        my $info = $source->relationship_info($relationship);
+
+        # if the accessor is a "multi" access, it returns a resultset, not a
+        # result.
         my $is_multi = 'multi' eq $info->{attrs}{accessor};
         my $source
           = $schema->resultset( $info->{source} )->result_source->source_name;
         my $other_class = $self->get_object_class_name($source);
 
         if ($is_multi) {
+
+            # all resultsets get blessed into our resultset class
             $meta->add_method(
                 $relationship => sub {
-                    my $self      = shift;
-                    my $resultset = $self->result_source->$relationship(@_)
+                    my $this      = shift;
+                    my $resultset = $this->result_source->$relationship(@_)
                       or return;
-                    return DBIx::Class::Objects::ResultSet->meta
-                      ->rebless_instance($resultset);
+                    return $self->_create_object_set($resultset);
                 },
             );
         }
         else {
+            # all results are our objects, not results
             $meta->add_method(
                 $relationship => sub {
-                    my $self = shift;
+                    my $this     = shift;
+                    my $response = $this->result_source->$relationship
+                      or return;
                     return $other_class->new(
-                        {   result_source =>
-                              $self->result_source->$relationship
-                        }
-                    );
+                        { result_source => $response } );
                 }
             );
         }
