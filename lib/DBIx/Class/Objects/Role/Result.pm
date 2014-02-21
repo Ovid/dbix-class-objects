@@ -57,7 +57,9 @@ DBIx::Class::Objects::Role::Result
 =head1 DESCRIPTION
 
 For internal use only. Adds a C<result_source> attribute to every class to
-return the original C<DBIx::Class> result.
+return the original C<DBIx::Class> result. This also handles setting up the
+delegation of direct object attributes. Relations add added via the
+C<load_objects> method on C<DBIx::Class::Objects>.
 
 =head1 AUTHOR
 

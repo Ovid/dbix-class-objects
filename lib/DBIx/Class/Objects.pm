@@ -5,7 +5,7 @@ use Carp;
 
 # using this because it will be applied to result classes, not because we want
 # to import this behavior
-use DBIx::Class::Objects::Role::Result;
+use DBIx::Class::Objects::Role::Result ();
 
 use Class::Load 'try_load_class';
 use namespace::autoclean;
