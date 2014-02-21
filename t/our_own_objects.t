@@ -11,9 +11,9 @@ my $people_rs = $schema->resultset('Person');
 my $fixtures = My::Fixtures->new( { schema => $schema } );
 $fixtures->load('person_without_customer');
 my $objects = My::Objects->new(
-    {   schema                             => $schema,
-        object_base                        => 'My::Object',
-        debug                              => 0,
+    {   schema      => $schema,
+        object_base => 'My::Object::',
+        debug       => 0,
     }
 );
 $objects->load_objects;
@@ -55,8 +55,7 @@ $customer->update;
 $customer = $objects->objectset('Customer')->first;
 
 is $customer->name, 'completely new name',
-    'Updating inherited attributes should work';
-
+  'Updating inherited attributes should work';
 
 $person_result = $fixtures->get_result('person_with_customer');
 $person = My::Object::Person->new( { result_source => $person_result } );
@@ -68,7 +67,7 @@ $fixtures->unload;
 $fixtures->load('order_with_items');
 
 # we only have one order loaded
-my $order = $objects->objectset('Order')->first;
+my $order       = $objects->objectset('Order')->first;
 my $order_items = $order->order_items;
 is $order_items->count, 2, 'Methods returning an objectset should work';
 
