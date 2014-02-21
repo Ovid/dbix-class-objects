@@ -1,6 +1,7 @@
 package My::Object::Person;
 
 use Moose;
+use namespace::autoclean;
 extends 'DBIx::Class::Objects::Base';
 
 sub is_customer {

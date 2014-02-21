@@ -1,19 +1,46 @@
 package DBIx::Class::Objects::Role::Result;
 use MooseX::Role::Parameterized;
+use DBIx::Class::Objects::Attribute::Trait::DBIC;
 
 parameter 'handles' => (
     isa      => 'ArrayRef[Str]',
     required => 1,
 );
 
+parameter 'source' => (
+    isa      => 'Str',
+    required => 1,
+);
+
+parameter 'result_source_class' => (
+    isa      => 'Str',
+    required => 1,
+);
+
 role {
     my $param = shift;
-    has 'result_source' => (
-        is       => 'ro',
-        isa      => 'DBIx::Class::Core',
-        required => 1,
-        handles  => $param->handles,
+
+    my $source = '_' . lc $param->source;
+    $source =~ s/\W+/_/g;
+    has $source => (
+        traits  => ['DBIC'],
+        is      => 'rw',
+        isa     => $param->result_source_class,
+        handles => $param->handles,
     );
+    has 'result_source' => (
+        is       => 'rw',
+        isa      => $param->result_source_class,
+        required => 1,
+    );
+
+    # XXX This looks strange, but here's what's going on. Inside of our
+    after 'BUILD' => sub {
+        my $self          = shift;
+        my $result_source = $self->result_source;
+        $self->$source($result_source)
+          if $result_source->isa( $param->result_source_class );
+    };
 };
 
 1;

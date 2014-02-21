@@ -18,24 +18,22 @@ my $objects = My::Objects->new(
 $objects->load_objects;
 
 my $person
-  = $objects->resultset('Person')->find( { email => 'not@home.com' } );
+  = $objects->objectset('Person')->find( { email => 'not@home.com' } );
 isa_ok $person, 'My::Object::Person';
 is $person->name, 'Bob', '... and their name should be correct';
 ok !$person->can('save'), '... and they do not directly inherit dbic methods';
 
 $fixtures->load('all_items');
-my $items = $objects->resultset('Item');
+my $items = $objects->objectset('Item');
 is $items->count, 3, 'We should have the correct number of items';
 
 while ( my $item = $items->next ) {
-    my $ref = ref $item;
-    show $ref;
     ok $item->isa('My::Object::Item'),
       '... and it should have the correct class name';
 }
 
 my @items
-  = $objects->resultset('Item')->search( { price => { '>' => 1.2 } } )->all;
+  = $objects->objectset('Item')->search( { price => { '>' => 1.2 } } )->all;
 is @items, 2, 'We should be able to search correctly';
 foreach my $item (@items) {
     ok $item->isa('My::Object::Item'),

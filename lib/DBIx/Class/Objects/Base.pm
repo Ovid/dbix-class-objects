@@ -9,11 +9,26 @@ sub BUILD {
     my $source        = $self->result_source;
     my @relationships = $source->relationships;
 
-    my $class = ref $self;
     foreach my $relationship (@relationships) {
         my $info = $source->relationship_info($relationship);
         next if 'multi' eq $info->{attrs}{accessor};
-        Test::Most::show($class, $relationship);
+        my $parent = $info->{_result_class_to_object_class};
+        next unless $self->isa($parent);
+        my $accessor = '_' . lc $parent;
+        $accessor =~ s/\W+/_/g;
+        $self->$accessor( $self->$relationship->result_source );
+    }
+}
+
+sub update {
+    my $self = shift;
+
+    foreach my $attribute ( $self->meta->get_all_attributes ) {
+        next
+          unless $attribute->does(
+            'DBIx::Class::Objects::Attribute::Trait::DBIC');
+        my $name = $attribute->name;
+        $self->$name->update;
     }
 }
 

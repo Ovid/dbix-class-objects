@@ -1,6 +1,7 @@
 package DBIx::Class::Objects;
 
 use Moose;
+use Carp;
 
 # using this because it will be applied to result classes, not because we want
 # to import this behavior
@@ -49,7 +50,7 @@ sub get_object_class_name {
     return $self->object_base . '::' . $source_name;
 }
 
-sub resultset {
+sub objectset {
     my ( $self, $source_name ) = @_;
 
     return $self->_create_object_set(
@@ -57,10 +58,13 @@ sub resultset {
 }
 
 sub _create_object_set {
+
+    # this method allows the user to ensure that resultsets contain instances
+    # of DBIx::Class::Objects instead of DBIx::Class::Result
     my ( $self, $resultset ) = @_;
 
     my %methods;
-    foreach my $method (qw/find first next/) {
+    foreach my $method (qw/find next/) {
 
         # Haven't debugged this, but simply declaring a single subroutine and
         # assigning it to the keys doesn't work. You get errors like this:
@@ -70,12 +74,18 @@ sub _create_object_set {
         # specified unique constraint 'primary' at t/resultset.t line 30
         #
         # Doing it this way results in a fresh copy of the subref for every
-        # method
+        # method at a slight performance cost. Caching bug?
         $methods{$method} = sub {
             my $this         = shift;
             my $result       = $this->next::method(@_) or return;
-            my $object_class = $self->get_object_class_name(
-                $result->result_source->source_name );
+            my $source_name  = $result->result_source->source_name;
+            unless ($source_name) {
+                my $type = ref $result;
+                croak("Panic: Couldn't determine source name in '$method' for '$type'");
+            }
+            my $object_class = $self->get_object_class_name($source_name)
+              or croak(
+                "Panic: Couldn't determine object class in '$method' for '$source_name'");
             return $object_class->new( { result_source => $result } );
         };
     }
@@ -107,22 +117,22 @@ sub load_objects {
     my $self   = shift;
     my $schema = $self->schema;
 
-    foreach my $source_name ( $schema->sources ) {
-        my $class = $self->get_object_class_name($source_name);
+    foreach my $source_name ($schema->sources) {
+        my $object_class = $self->get_object_class_name($source_name);
 
-        $self->_debug("Trying to load $class");
+        $self->_debug("Trying to load $object_class");
 
-        if ( try_load_class($class) ) {
-            $self->_debug("\t$class found.");
+        if ( try_load_class($object_class) ) {
+            $self->_debug("\t$object_class found.");
         }
         else {
-            $self->_debug("\t$class not found. Building.");
+            $self->_debug("\t$object_class not found. Building.");
             Moose::Meta::Class->create(
-                $class,
+                $object_class,
                 superclasses => [ $self->base_class ],
             );
-            unless ( Class::Load::is_class_loaded($class) ) {
-                die "$class didn't load";
+            unless ( Class::Load::is_class_loaded($object_class) ) {
+                die "$object_class didn't load";
             }
         }
 
@@ -130,11 +140,11 @@ sub load_objects {
         # DBIx::Class::Objects::Base, we do it for them. It works around an
         # issue the programmer might forget, but is this too much magic, given
         # that we're already doing a lot of it?
-        unless ( $class->isa( $self->base_class ) ) {
-            $class->meta->superclasses( $class->meta->superclasses,
+        unless ( $object_class->isa( $self->base_class ) ) {
+            $object_class->meta->superclasses( $object_class->meta->superclasses,
                 $self->base_class );
         }
-        $self->_add_methods( $class, $source_name );
+        $self->_add_methods( $object_class, $source_name );
     }
 }
 
@@ -144,9 +154,12 @@ sub _add_methods {
     my $meta   = $class->meta;
 
     my $source = $schema->resultset($source_name)->result_source;
+
     $self->result_role->meta->apply(
         $meta,
-        handles => [ $source->columns ],
+        handles             => [ $source->columns ],
+        result_source_class => $source->result_class,
+        source              => $class,
     );
 
     my @relationships = $source->relationships;
@@ -159,6 +172,9 @@ sub _add_methods {
         my $source
           = $schema->resultset( $info->{source} )->result_source->source_name;
         my $other_class = $self->get_object_class_name($source);
+
+        # XXX Bless me father for I have sinned ...
+        $info->{_result_class_to_object_class} = $other_class;
 
         if ($is_multi) {
 
