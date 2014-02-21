@@ -15,10 +15,9 @@ tests_recursive('t');
 resources(
     #homepage   => 'http://yourwebsitehere.com',
     #IRC        => 'irc://irc.perl.org/#DBIx-Class-Objects',
-    license => 'http://www.perlfoundation.org/artistic_license_2_0',
-
-    #repository => 'git://github.com/Curtis "Ovid" Poe/dbix-class-objects.git',
-    bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-Objects',
+    license    => 'http://www.perlfoundation.org/artistic_license_2_0',
+    repository => 'git://github.com/Curtis "Ovid" Poe/dbix-class-objects.git',
+    bugtracker => 'https://github.com/Ovid/dbix-class-objects/issues',
 );
 
 configure_requires(
@@ -34,7 +33,7 @@ requires(
     'Class::Load'                 => 0,
     'DBIx::Class'                 => 0,
     'Moose'                       => 0,
-	'MooseX::NonMoose'            => 0,
+    'MooseX::NonMoose'            => 0,
     'MooseX::Role::Parameterized' => 0,
 );
 
