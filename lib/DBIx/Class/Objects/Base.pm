@@ -1,6 +1,7 @@
 package DBIx::Class::Objects::Base;
 
 use Moose;
+use DBIx::Class::Objects::Util 'class_name_to_private_accessor';
 
 sub BUILD {
     my $self = shift;
@@ -14,8 +15,7 @@ sub BUILD {
         next if 'multi' eq $info->{attrs}{accessor};
         my $parent = $info->{_result_class_to_object_class};
         next unless $self->isa($parent);
-        my $accessor = '_' . lc $parent;
-        $accessor =~ s/\W+/_/g;
+        my $accessor = class_name_to_private_accessor($parent);
         $self->$accessor( $self->$relationship->result_source );
     }
 }

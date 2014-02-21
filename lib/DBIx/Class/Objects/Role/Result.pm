@@ -1,6 +1,7 @@
 package DBIx::Class::Objects::Role::Result;
 use MooseX::Role::Parameterized;
 use DBIx::Class::Objects::Attribute::Trait::DBIC;
+use DBIx::Class::Objects::Util 'class_name_to_private_accessor';
 
 parameter 'handles' => (
     isa      => 'ArrayRef[Str]',
@@ -20,8 +21,8 @@ parameter 'result_source_class' => (
 role {
     my $param = shift;
 
-    my $source = '_' . lc $param->source;
-    $source =~ s/\W+/_/g;
+    my $source = class_name_to_private_accessor( $param->source );
+
     has $source => (
         traits  => ['DBIC'],
         is      => 'rw',
