@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new DBIx::Class::Objects!'
+abstract: 'Rewrite your DBIC objects via inheritance'
 author:
   - 'Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>'
   - 'Curtis "Ovid" Poe <ovid@cpan.org>'
