@@ -9,4 +9,6 @@ sub is_customer {
     return defined $self->customer;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;

@@ -140,11 +140,14 @@ sub load_objects {
         # DBIx::Class::Objects::Base, we do it for them. It works around an
         # issue the programmer might forget, but is this too much magic, given
         # that we're already doing a lot of it?
+        my $meta = $object_class->meta;
+        my $was_immutable = $meta->is_immutable;
+        $meta->make_mutable if $was_immutable;
         unless ( $object_class->isa( $self->base_class ) ) {
-            $object_class->meta->superclasses( $object_class->meta->superclasses,
-                $self->base_class );
+            $meta->superclasses( $meta->superclasses, $self->base_class );
         }
         $self->_add_methods( $object_class, $source_name );
+        $meta->make_immutable if $was_immutable;
     }
 }
 
