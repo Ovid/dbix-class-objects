@@ -51,7 +51,6 @@ is $customer->name, $customer->person->name,
   '... and return the correct value';
 
 $customer->name('completely new name');
-$customer->result_source->update;
 $customer->update;
 $customer = $objects->objectset('Customer')->first;
 
