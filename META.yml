@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/Ovid/dbix-class-objects/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: 'git://github.com/Curtis "Ovid" Poe/dbix-class-objects.git'
-version: '0.01'
+version: '0.02'
