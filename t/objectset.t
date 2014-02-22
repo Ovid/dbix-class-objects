@@ -5,7 +5,6 @@ use My::Objects;
 use My::Fixtures;
 use Sample::Schema;
 
-use Carp::Always;
 my $schema = Sample::Schema->test_schema;
 my $fixtures = My::Fixtures->new( { schema => $schema } );
 $fixtures->load('person_without_customer');
