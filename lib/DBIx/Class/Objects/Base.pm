@@ -3,7 +3,7 @@ package DBIx::Class::Objects::Base;
 use Moose;
 use DBIx::Class::Objects::Util 'class_name_to_private_accessor';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub BUILD {
     my $self = shift;

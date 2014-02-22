@@ -3,7 +3,7 @@ package DBIx::Class::Objects::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(

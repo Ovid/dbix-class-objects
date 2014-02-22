@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-Objects
 
+0.02
+        - Remove Carp::Always from a test file.
+
 0.01    Date/time
         Wrapper to use dbic objects any way you want.
 

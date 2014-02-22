@@ -3,7 +3,7 @@ use MooseX::Role::Parameterized;
 use DBIx::Class::Objects::Attribute::Trait::DBIC;
 use DBIx::Class::Objects::Util 'class_name_to_private_accessor';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 parameter 'handles' => (
     isa      => 'ArrayRef[Str]',
