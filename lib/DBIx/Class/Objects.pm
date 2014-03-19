@@ -72,7 +72,7 @@ sub _create_object_set {
     my ( $self, $resultset ) = @_;
 
     my %methods;
-    foreach my $method (qw/find next/) {
+    foreach my $method (qw/next create single/) {
 
         # Haven't debugged this, but simply declaring a single subroutine and
         # assigning it to the keys doesn't work. You get errors like this:
