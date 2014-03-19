@@ -16,7 +16,6 @@ inc/Module/Install/WriteAll.pm
 lib/DBIx/Class/Objects.pm
 lib/DBIx/Class/Objects/Attribute/Trait/DBIC.pm
 lib/DBIx/Class/Objects/Base.pm
-lib/DBIx/Class/Objects/ResultSet.pm
 lib/DBIx/Class/Objects/Role/ClassName.pm
 lib/DBIx/Class/Objects/Role/Result.pm
 lib/DBIx/Class/Objects/Util.pm
