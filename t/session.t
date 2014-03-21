@@ -22,10 +22,23 @@ my $session = $objects->objectset('Session')->first;
 my $uid = $user->username;
 $session->username($uid);
 $session->update();
-
 is $session->username, $user->username, "storing in a nullable relation works";
 
 my $db_session = $schema->resultset('Session')->first;
-is $db_session->username, $user->username, "that's actually in db now";
+is $db_session->username, $user->username, "...and that's actually in the db now";
+
+# assuming tests above went wrong, force it:
+$db_session->username($uid);
+$db_session->update();
+
+$session = $objects->objectset('Session')->first; # why must moose obj be reloaded?
+
+is ref($session->username), "My::Object::User", "username refers to the right class now";
+is ref($db_session->username), "Sample::Schema::Result::User", "...ditto for dbic";
+
+$session->username(undef);
+$session->update();
+
+is $session->username, undef, "nulling the relation works";
 
 done_testing;
