@@ -36,6 +36,11 @@ role {
         isa      => $param->result_source_class,
         required => 1,
     );
+    has 'object_source' => (
+	is       => 'rw',
+	isa      => 'DBIx::Class::Objects',
+	required => 1,
+    );
 
     # XXX This looks strange, but here's what's going on. Inside of our
     after 'BUILD' => sub {
