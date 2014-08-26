@@ -19,7 +19,7 @@ my $objects = My::Objects->new(
 $objects->load_objects;
 
 my $person_result = $fixtures->get_result('person_without_customer');
-my $person = My::Object::Person->new( { result_source => $person_result } );
+my $person = My::Object::Person->new( { result_source => $person_result, object_source => $objects } );
 
 my @attributes = qw(person_id name birthday email);
 foreach my $attribute (@attributes) {
@@ -43,13 +43,13 @@ is $people->first->name, 'Not the real name',
 $fixtures->load('basic_customer');
 my $customer = $fixtures->get_result('basic_customer');
 $person_result = $fixtures->get_result('person_with_customer');
-$person = My::Object::Person->new( { result_source => $person_result } );
+$person = My::Object::Person->new( { result_source => $person_result, object_source => $objects } );
 
 isa_ok $person->customer, 'My::Object::Customer';
 
 $fixtures->load('order_with_items');
 my $order_result = $fixtures->get_result('order_with_items');
-my $order        = My::Object::Order->new( { result_source => $order_result } );
+my $order        = My::Object::Order->new( { result_source => $order_result, object_source => $objects } );
 my $order_items  = $order->order_items;
 is $order_items->count, 2, 'Methods returning resultsets should work';
 ok $order_items->isa('DBIx::Class::ResultSet'),

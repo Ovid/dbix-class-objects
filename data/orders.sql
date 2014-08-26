@@ -33,3 +33,13 @@ CREATE TABLE order_item (
     FOREIGN KEY(item_id)  REFERENCES items(item_id),
     FOREIGN KEY(order_id) REFERENCES orders(order_id)
 );
+
+CREATE TABLE "users" (
+    "username" varchar(20) PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE "sessions" (
+    "session_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "username" varchar(20),
+    FOREIGN KEY("username") REFERENCES "users"("username")
+);

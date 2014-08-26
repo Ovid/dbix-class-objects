@@ -110,6 +110,16 @@ my %definition_for = (
         },
         next => [qw/order_item_hammer order_item_screwdriver/],
     },
+
+    user => {
+	new => 'User',
+	using => { username => 'U1' },
+	next => [qw/session/],
+    },
+    session => {
+	new => 'Session',
+	using => { session_id => 1 },
+    },
 );
 
 sub get_definition {

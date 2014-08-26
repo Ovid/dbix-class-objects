@@ -19,7 +19,7 @@ my $objects = My::Objects->new(
 $objects->load_objects;
 
 my $person_result = $fixtures->get_result('person_without_customer');
-my $person = My::Object::Person->new( { result_source => $person_result } );
+my $person = My::Object::Person->new( { result_source => $person_result, object_source => $objects } );
 
 my @attributes = qw(person_id name birthday email);
 foreach my $attribute (@attributes) {
@@ -58,7 +58,7 @@ is $customer->name, 'completely new name',
   'Updating inherited attributes should work';
 
 $person_result = $fixtures->get_result('person_with_customer');
-$person = My::Object::Person->new( { result_source => $person_result } );
+$person = My::Object::Person->new( { result_source => $person_result, object_source => $objects } );
 
 isa_ok $person->customer, 'My::Object::Customer';
 ok $person->is_customer,  '... and our custom methods should still work';
