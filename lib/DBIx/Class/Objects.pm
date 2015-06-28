@@ -2,6 +2,7 @@ package DBIx::Class::Objects;
 
 use Moose;
 use Carp;
+use Moose::Util qw( apply_all_roles );
 
 # using this because it will be applied to result classes, not because we want
 # to import this behavior
@@ -36,6 +37,13 @@ has 'result_role' => (
     isa      => 'Str',
     required => 1,
     default  => 'DBIx::Class::Objects::Role::Result',
+);
+
+has roles => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    required => 0,
+    default => sub { [] },
 );
 
 has 'object_base' => (
@@ -155,6 +163,9 @@ sub load_objects {
             $meta->superclasses( $meta->superclasses, $self->base_class );
         }
         $self->_add_methods( $object_class, $source_name );
+
+    	apply_all_roles( $object_class, @{ $self->roles } ) if scalar(@{ $self->roles });
+
         $meta->make_immutable if $was_immutable;
     }
 }
@@ -241,6 +252,7 @@ DBIx::Class::Objects - Rewrite your DBIC objects via inheritance
     my $objects = DBIx::Class::Objects->new({
         schema      => $schema,
         object_base => 'My::Object',
+        roles       => [qw( My::Role::Thing )],
     });
     $objects->load_objects;
 
@@ -349,6 +361,12 @@ built on the fly.
         My::Object::Item not found. Building.
     Trying to load My::Object::OrderItem
         My::Object::OrderItem not found. Building.
+
+=item * C<roles> (optional)
+
+This will apply the optional Moose role(s) to your My::Object classes.  Useful
+for if you have some utility functions you would like applied to each table
+without having to create files for every table.
 
 =back
 
