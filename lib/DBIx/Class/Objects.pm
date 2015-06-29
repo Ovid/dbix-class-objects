@@ -133,6 +133,8 @@ sub load_objects {
     my $self   = shift;
     my $schema = $self->schema;
 
+    apply_all_roles( $self->base_class, @{ $self->roles } ) if scalar(@{ $self->roles });
+
     foreach my $source_name ($schema->sources) {
         my $object_class = $self->_get_object_class_name($source_name);
 
@@ -163,8 +165,6 @@ sub load_objects {
             $meta->superclasses( $meta->superclasses, $self->base_class );
         }
         $self->_add_methods( $object_class, $source_name );
-
-    	apply_all_roles( $object_class, @{ $self->roles } ) if scalar(@{ $self->roles });
 
         $meta->make_immutable if $was_immutable;
     }
