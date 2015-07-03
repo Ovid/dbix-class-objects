@@ -1,8 +1,12 @@
 Revision history for DBIx-Class-Objects
 
-0.03    2015-07-03
-        - Add roles to constructor
-        - add delete method
+0.04    2015-07-03
+        - Remove 'find' wrapper, add 'single' and 'create' wrapper 
+          - Lars Balker
+        - Add 'roles' to new() for importing Moose Roles into your 
+          row classes - Dan Burke
+        - Add delete method - also fixes delete_all - Dan Burke
+        - Dan Burke (dburke@addictmud.org) maintaining things going forward
 
 0.02    2014-02-22
         - Remove Carp::Always from a test file.

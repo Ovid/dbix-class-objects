@@ -11,7 +11,7 @@ use DBIx::Class::Objects::Role::Result ();
 use Class::Load 'try_load_class';
 use namespace::autoclean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has 'schema' => (
     is       => 'ro',
@@ -243,7 +243,7 @@ DBIx::Class::Objects - Rewrite your DBIC objects via inheritance
 
 =head1 VERSION
 
-0.03
+0.04
 
 =head1 SYNOPSIS
 
