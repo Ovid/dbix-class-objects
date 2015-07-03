@@ -34,6 +34,11 @@ sub update {
     }
 }
 
+sub delete {
+    my $self = shift;
+    $self->result_source->delete;
+}
+
 1;
 
 __END__
