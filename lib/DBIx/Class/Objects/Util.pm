@@ -3,7 +3,7 @@ package DBIx::Class::Objects::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -32,6 +32,8 @@ No user-serviceable parts inside.
 =head1 AUTHOR
 
 Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+Dan Burke C<< dburke at addictmud.org >>
 
 =head1 BUGS
 
