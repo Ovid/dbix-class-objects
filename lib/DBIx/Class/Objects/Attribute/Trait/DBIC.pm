@@ -2,7 +2,7 @@ package DBIx::Class::Objects::Attribute::Trait::DBIC;
 
 use Moose::Role;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 package Moose::Meta::Attribute::Custom::Trait::DBIC;
 sub register_implementation { 'DBIx::Class::Objects::Attribute::Trait::DBIC' }
@@ -21,6 +21,8 @@ attributes.
 =head1 AUTHOR
 
 Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+Dan Burke C<< dburke at addictmud.org >>
 
 =head1 BUGS
 

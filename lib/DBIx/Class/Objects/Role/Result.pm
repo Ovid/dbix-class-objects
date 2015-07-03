@@ -3,7 +3,7 @@ use MooseX::Role::Parameterized;
 use DBIx::Class::Objects::Attribute::Trait::DBIC;
 use DBIx::Class::Objects::Util 'class_name_to_private_accessor';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 parameter 'handles' => (
     isa      => 'ArrayRef[Str]',
@@ -69,6 +69,8 @@ C<load_objects> method on C<DBIx::Class::Objects>.
 =head1 AUTHOR
 
 Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+Dan Burke C<< dburke at addictmud.org >>
 
 =head1 BUGS
 
