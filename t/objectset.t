@@ -41,4 +41,16 @@ foreach my $item (@items) {
       '... and the search parameters should be respected';
 }
 
+my $all = $objects->objectset('Item')->all;
+cmp_ok $all, '==', 3, 'got 3 records';
+
+$objects->objectset('Item')->first->delete;
+
+$all = $objects->objectset('Item')->all;
+cmp_ok $all, '==', 2, '... down to got 2';
+
+$objects->objectset('Item')->delete_all;
+$all = $objects->objectset('Item')->all;
+ok !defined $all, '... down to zero';
+
 done_testing;
