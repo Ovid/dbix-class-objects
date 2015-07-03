@@ -26,7 +26,7 @@ role {
     my $source = class_name_to_private_accessor( $param->source );
 
     has $source => (
-        traits  => ['DBIC'],
+        traits  => ['DBIx::Class::Objects::Attribute::Trait::DBIC'],
         is      => 'rw',
         isa     => $param->result_source_class,
         handles => $param->handles,

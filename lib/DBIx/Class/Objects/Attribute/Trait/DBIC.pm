@@ -4,7 +4,7 @@ use Moose::Role;
 
 our $VERSION = '0.04';
 
-package Moose::Meta::Attribute::Custom::Trait::DBIC;
+#package Moose::Meta::Attribute::Custom::Trait::DBIC;
 sub register_implementation { 'DBIx::Class::Objects::Attribute::Trait::DBIC' }
 
 1;
